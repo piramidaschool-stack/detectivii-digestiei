@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detectivii Digestiei - Clasa a IV-a</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', Arial, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #764ba2;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .instructions {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .organs-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        .organ-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            border: 3px solid #667eea;
+            text-align: center;
+            width: 130px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .organ-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        .organ-card.selected {
+            background: #d4edda;
+            border-color: #28a745;
+            transform: scale(1.1);
+        }
+        .organ-card .emoji {
+            font-size: 2.5em;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .organ-card .name {
+            font-weight: bold;
+            color: #333;
+            display: block;
+        }
+        .organ-card .number {
+            display: none;
+            background: #667eea;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            line-height: 25px;
+            margin: 10px auto 0;
+            font-size: 0.9em;
+        }
+        .organ-card.selected .number {
+            display: block;
+        }
+        .buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            margin: 0 10px;
+            transition: all 0.3s;
+        }
+        .btn-check {
+            background: #667eea;
+            color: white;
+        }
+        .btn-check:hover {
+            background: #764ba2;
+        }
+        .btn-reset {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-reset:hover {
+            background: #5a6268;
+        }
+        #result {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            display: none;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+        .pair-info {
+            background: #e7f3ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        .pair-info h3 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+        .pair-info ol {
+            margin-left: 20px;
+            line-height: 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕵️ Detectivii Digestiei</h1>
+        <p class="subtitle">Clasa a IV-a - Științe ale naturii</p>
+
+        <div class="instructions">
+            <strong>📋 Sarcina:</strong> Click pe organe în ordinea corectă a digestiei (de la 1 la 6)<br>
+            <strong>⚠️ Atenție: Organele sunt amestecate!</strong><br>
+            <strong>👥 Lucrați în perechi!</strong>
+        </div>
+
+        <div class="organs-container" id="organsContainer">
+            <!-- Organele vor fi generate aleatoriu de JavaScript -->
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-check" onclick="checkOrder()">✓ Verifică Răspunsul</button>
+            <button class="btn btn-reset" onclick="resetActivity()">↺ Începe din Nou</button>
+        </div>
+
+        <div id="result"></div>
+
+        <div class="pair-info">
+            <h3>📝 Instrucțiuni pentru perechi:</h3>
+            <ol>
+                <li>Discutați împreună unde ajunge mâncarea primul</li>
+                <li>Click pe organe în ordinea corectă</li>
+                <li>Când toate 6 sunt selectate, apăsați "Verifică"</li>
+                <li>Dacă e greșit, apăsați "Începe din Nou" și încercați din nou!</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Datele organelor cu emoji CORECTE
+        const organsData = [
+            { position: 1, name: "Gura", emoji: "👄" },
+            { position: 2, name: "Esofag", emoji: "🥖" },
+            { position: 3, name: "Stomac", emoji: "🍲" },
+            { position: 4, name: "Ficat", emoji: "🥩" },
+            { position: 5, name: "Int. Subțire", emoji: "🌀" },
+            { position: 6, name: "Int. Gros", emoji: "🌽" }
+        ];
+
+        let selectedOrgans = [];
+
+        // Funcție pentru amestecarea aleatorie a organelor
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Generare organe în ordine aleatorie la încărcarea paginii
+        function renderOrgans() {
+            const container = document.getElementById('organsContainer');
+            container.innerHTML = '';
+            
+            // Creăm o copie și o amestecăm
+            const shuffledOrgans = shuffleArray([...organsData]);
+            
+            shuffledOrgans.forEach(organ => {
+                const card = document.createElement('div');
+                card.className = 'organ-card';
+                card.onclick = function() { selectOrgan(this, organ.position); };
+                card.innerHTML = `
+                    <span class="emoji">${organ.emoji}</span>
+                    <span class="name">${organ.name}</span>
+                    <span class="number">1</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function selectOrgan(card, correctPosition) {
+            if (card.classList.contains('selected')) {
+                card.classList.remove('selected');
+                selectedOrgans = selectedOrgans.filter(item => item.position !== correctPosition);
+            } else {
+                card.classList.add('selected');
+                selectedOrgans.push({
+                    position: correctPosition,
+                    element: card
+                });
+                
+                // Actualizăm numărul afișat
+                const numberSpan = card.querySelector('.number');
+                numberSpan.textContent = selectedOrgans.length;
+            }
+        }
+
+        function checkOrder() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+
+            if (selectedOrgans.length !== 6) {
+                resultDiv.className = 'warning';
+                resultDiv.innerHTML = '⚠️ <strong>Atenție!</strong> Trebuie să selectezi toate cele 6 organe!';
+                return;
+            }
+
+            const correctOrder = [1, 2, 3, 4, 5, 6];
+            const userOrder = selectedOrgans.map(item => item.position);
+
+            if (JSON.stringify(userOrder) === JSON.stringify(correctOrder)) {
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <div style="font-size: 3em; margin-bottom: 10px;">🎉</div>
+                    <strong>FELICITĂRI!</strong><br>
+                    Ai ordonat corect sistemul digestiv!<br>
+                    <span style="font-size: 0.9em;">👄 → 🥖 → 🍲 → 🥩 → 🌀 → 🌽</span>
+                `;
+                selectedOrgans.forEach(item => {
+                    item.element.style.borderColor = '#28a745';
+                    item.element.style.background = '#d4edda';
+                });
+            } else {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <div style="font-size: 3em; margin-bottom: 10px;">💡</div>
+                    <strong>Mai încearcă!</strong><br>
+                    Ordinea nu este corectă.<br>
+                    <span style="font-size: 0.9em;">Gândește-te: Unde intră mâncarea primul?</span><br>
+                    <button class="btn btn-reset" onclick="resetActivity()" style="margin-top: 15px; padding: 10px 25px;">↺ Încearcă din nou</button>
+                `;
+            }
+        }
+
+        function resetActivity() {
+            selectedOrgans = [];
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('result').innerHTML = '';
+            renderOrgans(); // Reamestecă organele la reset!
+        }
+
+        // Inițializare la încărcarea paginii
+        window.onload = renderOrgans;
+    </script>
+</body>
+</html>
